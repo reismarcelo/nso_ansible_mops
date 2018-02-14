@@ -1,0 +1,67 @@
+---
+# tasks file for backup-config
+
+# TODO: Need to close the session and re-open in order for it to take effect
+- name: configure NSO prompts
+  nso_config:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    data:
+      tailf-ncs:devices:
+        global-settings:
+          ned-settings:
+            tailf-ned-cisco-ios-xr-meta:cisco-iosxr-auto-prompts:
+            - id: "1"
+              question: "Destination file"
+              answer: "ENTER"
+            - id: "2"
+              question: "overwrite"
+              answer: "yes"
+
+- name: backup running-config
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "copy running-config {{ backup_path }}{{ target_device }}-config-{{ timestamp }}" ]
+  register: backup_output
+  failed_when: >
+    ("output" not in backup_output) or
+    (backup_output.output|length < 1) or
+    ("[OK]" not in (backup_output.output|first).value)
+
+- name: backup admin running-config
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin copy running-config {{ backup_path }}{{ target_device }}-admin-config-{{ timestamp }}" ]
+  register: backup_output
+  failed_when: >
+    ("output" not in backup_output) or
+    (backup_output.output|length < 1) or
+    ("[OK]" not in (backup_output.output|first).value)
+
+- name: copy config backups to standby RP
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "copy {{ backup_path }}{{ item }} {{ backup_path }} location {{ standby_rp }}" ]
+  with_items:
+  - "{{ target_device }}-config-{{ timestamp }}"
+  - "{{ target_device }}-admin-config-{{ timestamp }}"
+  when: standby_rp is defined
+  register: copy_output
+  failed_when: >
+    ("output" not in copy_output) or
+    (copy_output.output|length < 1) or
+    ("bytes copied" not in (copy_output.output|first).value)
+

@@ -1,0 +1,9 @@
+---
+- name: Check-sync
+  hosts: localhost
+  connection: local
+  roles:
+  - check-sync
+  - backup-config
+  - pre-post-checks
+

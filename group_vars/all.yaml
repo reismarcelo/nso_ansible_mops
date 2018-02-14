@@ -1,0 +1,8 @@
+---
+# NSO server information
+nso:
+  url: http://localhost:8080/jsonrpc
+  username: admin
+  password: admin
+
+target_device: "A3-ASR9K-R6"

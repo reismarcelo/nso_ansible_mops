@@ -1,0 +1,4 @@
+---
+# defaults file for pre-post-checks
+
+post-check: false

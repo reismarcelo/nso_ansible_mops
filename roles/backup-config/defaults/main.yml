@@ -1,0 +1,9 @@
+---
+# defaults file for backup-config
+
+# Path on the target device to use for configuration backups
+backup_path: "harddisk:"
+
+# standby_rp: "0/RSP1/CPU0"
+
+timestamp: "{{ ansible_date_time.day }}{{ ansible_date_time.month }}{{ ansible_date_time.year }}"
