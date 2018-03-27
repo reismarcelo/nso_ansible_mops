@@ -2,8 +2,20 @@
 - name: Check-sync
   hosts: localhost
   connection: local
-  roles:
-  - check-sync
-  - backup-config
-  - pre-post-checks
+
+  tasks:
+
+  - import_role:
+      name: check-sync
+
+  - import_role:
+      name: backup-config
+
+  - import_role:
+      name: pre-post-checks
+
+  - import_role:
+      name: pre-post-checks
+    vars:
+      post_check: true
 

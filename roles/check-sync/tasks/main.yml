@@ -9,7 +9,7 @@
     path: "/ncs:devices/device{'{{ target_device }}'}/check-sync"
   register: check_sync_result
   changed_when: false
-  failed_when: ("output" not in check_sync_result) or (check_sync_result.output|length < 1)
+  failed_when: ("output" not in check_sync_result) or ("result" not in check_sync_result.output)
 
 - name: sync-from
   nso_action:
@@ -17,7 +17,7 @@
     username: "{{ nso.username }}"
     password: "{{ nso.password }}"
     path: "/ncs:devices/device{'{{ target_device }}'}/sync-from"
-  when: (check_sync_result.output|first).value != "in-sync"
+  when: check_sync_result.output.result != "in-sync"
   register: sync_from_output
 
 
