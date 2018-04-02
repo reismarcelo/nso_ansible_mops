@@ -6,3 +6,7 @@ nso:
   password: admin
 
 target_device: "A3-ASR9K-R6"
+
+xr_package:
+  location: "harddisk:/"
+  filename: "asr9k-px-5.3.3-smupack.tar"

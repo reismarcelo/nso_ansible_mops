@@ -1,0 +1,89 @@
+---
+# tasks file for upgrade
+- name: install commit
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin install commit" ]
+  register: install_commit_result
+  failed_when: "'completed successfully at' not in install_commit_result.output.result"
+
+- name: check for inactive packages
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin show install inactive summary | noprompts" ]
+  register: show_install_inactive_result
+  changed_when: false
+
+- name: install remove inactive
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin install remove inactive prompt-level none synchronous | noprompts" ]
+  register: install_remove_inactive_result
+  failed_when: "'completed successfully at' not in install_remove_inactive_result.output.result"
+  when: "'There are no inactive packages' not in show_install_inactive_result.output.result"
+
+- name: install add
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin install add {{ xr_package.location ~ xr_package.filename }} synchronous | noprompts" ]
+  register: install_add_result
+  failed_when: "'completed successfully at' not in install_add_result.output.result"
+
+- name: confirm whether to proceed
+  pause:
+    prompt: "Entering service-affecting portion of the upgrade, press <ENTER> to continue"
+  when:
+  - prompt_user is defined
+  - prompt_user | bool
+  tags:
+  - service_impact
+
+- name: install activate
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin install activate id {{ install_add_result.output.result | regex_findall('Install operation (\\d+) completed successfully') | max }} prompt-level none synchronous parallel-reload | noprompts" ]
+  tags:
+  - service_impact
+
+- name: disconnect from device
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/disconnect"
+  tags:
+  - service_impact
+
+- name: wait for device reload
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/ping"
+  register: ping_result
+  changed_when: false
+  until: "'0 packets received' in ping_result.output.result"
+  retries: "{{ wait_reload.retries }}"
+  delay: "{{ wait_reload.timeout }}"
+  tags:
+  - service_impact

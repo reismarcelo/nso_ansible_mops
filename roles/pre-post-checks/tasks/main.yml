@@ -12,7 +12,7 @@
     ("output" not in device_check_result) or
     ("success" not in device_check_result.output)
 
-- name: pre/post diff
+- name: pre-post assessment diff
   nso_action:
     url: "{{ nso.url }}"
     username: "{{ nso.username }}"
@@ -23,4 +23,6 @@
   failed_when: >
     ("output" not in diff_check_result) or
     ("success" not in diff_check_result.output)
-  when: post_check is defined and post_check
+  when:
+  - post_check is defined
+  - post_check | bool

@@ -1,5 +1,5 @@
 ---
-- name: Check-sync
+- name: ASR-9K upgrade MOP
   hosts: localhost
   connection: local
 
@@ -15,7 +15,16 @@
       name: pre-post-checks
 
   - import_role:
+      name: upgrade
+
+  - import_role:
+      name: wait-device-up
+
+  - import_role:
       name: pre-post-checks
     vars:
       post_check: true
+
+  - import_role:
+      name: post-upgrade
 

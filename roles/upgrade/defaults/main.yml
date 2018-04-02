@@ -1,0 +1,7 @@
+---
+# defaults file for upgrade
+wait_reload:
+  timeout: 10
+  retries: 40
+
+prompt_user: true

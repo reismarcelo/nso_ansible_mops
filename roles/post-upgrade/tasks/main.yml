@@ -1,0 +1,32 @@
+---
+# tasks file for post-upgrade
+- name: check config failed startup
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "show configuration failed startup" ]
+  register: config_failed_startup_result
+  changed_when: false
+
+- name: evaluate config failed startup output
+  pause:
+    prompt: "Please evaluate the 'show config failed startup' output:\n\n{{ config_failed_startup_result.output.result | regex_findall('[\\r\\n]+([^\\r\\n]+)') | join('\n')}}\n\nPress <ENTER> to continue"
+  when: "(config_failed_startup_result.output.result | regex_findall('[\\r\\n]+([^\\r\\n]+)') | length) > 3"
+
+- name: install commit
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
+    input:
+      args: [ "admin install commit" ]
+  register: install_commit_result
+  failed_when: "'completed successfully at' not in install_commit_result.output.result"
+
+
+
+

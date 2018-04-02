@@ -1,0 +1,30 @@
+---
+# tasks file for wait-device-up
+- name: wait for device connectivity
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:devices/device{'{{ target_device }}'}/ping"
+  register: ping_result
+  changed_when: false
+  until: "'1 packets received' in ping_result.output.result"
+  retries: "{{ wait_1.retries }}"
+  delay: "{{ wait_1.timeout }}"
+
+- name: wait for all cards to come up
+  nso_action:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    path: "/ncs:services/snap:health-samples/snap:device{'{{ target_device }}'}/run-light"
+  register: light_check_result
+  changed_when: false
+  failed_when: >
+    ("output" not in light_check_result) or
+    ("success" not in light_check_result.output)
+  until: "'success' in light_check_result.output"
+  retries: "{{ wait_2.retries }}"
+  delay: "{{ wait_2.timeout }}"
+
+

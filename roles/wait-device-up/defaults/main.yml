@@ -1,0 +1,9 @@
+---
+# defaults file for wait-device-up
+wait_1:
+  timeout: 30
+  retries: 40
+
+wait_2:
+  timeout: 15
+  retries: 40
