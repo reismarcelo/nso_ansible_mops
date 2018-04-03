@@ -15,6 +15,9 @@
       name: pre-post-checks
 
   - import_role:
+      name: pre-upgrade
+
+  - import_role:
       name: upgrade
 
   - import_role:

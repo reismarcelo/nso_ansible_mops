@@ -27,6 +27,18 @@
   register: install_commit_result
   failed_when: "'completed successfully at' not in install_commit_result.output.result"
 
-
-
+- name: enable fpd auto-upgrade
+  nso_config:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    data:
+      tailf-ncs:devices:
+        device:
+        - name: "{{ target_device }}"
+          tailf-ncs:config:
+            tailf-ned-cisco-ios-xr:admin:
+              fpd:
+                auto-upgrade:
+                - null
 

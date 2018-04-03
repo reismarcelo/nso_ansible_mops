@@ -1,0 +1,25 @@
+---
+# tasks file for pre-upgrade
+- name: disable fpd auto-upgrade
+  nso_config:
+    url: "{{ nso.url }}"
+    username: "{{ nso.username }}"
+    password: "{{ nso.password }}"
+    data:
+      tailf-ncs:devices:
+        device:
+        - name: "{{ target_device }}"
+          tailf-ncs:config:
+            tailf-ned-cisco-ios-xr:admin:
+              fpd:
+                auto-upgrade:
+                __state: absent
+
+
+
+
+
+
+
+
+
