@@ -5,8 +5,10 @@ nso:
   username: admin
   password: admin
 
+# Device to be upgraded
 target_device: "A3-ASR9K-R6"
 
+# Information about the XR software
 xr_package:
   location: "harddisk:/"
   filename: "asr9k-px-5.3.3-smupack.tar"
