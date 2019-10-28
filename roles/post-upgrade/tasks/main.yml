@@ -39,6 +39,6 @@
           tailf-ncs:config:
             tailf-ned-cisco-ios-xr:admin:
               fpd:
-                auto-upgrade:
-                - null
+                auto-upgrade: {}
+
 

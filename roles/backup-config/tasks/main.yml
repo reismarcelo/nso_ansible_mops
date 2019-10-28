@@ -1,7 +1,6 @@
 ---
 # tasks file for backup-config
 
-# TODO: Need to close the session and re-open in order for it to take effect
 - name: configure NSO prompts
   nso_config:
     url: "{{ nso.url }}"
@@ -11,13 +10,15 @@
       tailf-ncs:devices:
         global-settings:
           ned-settings:
-            tailf-ned-cisco-ios-xr-meta:cisco-iosxr-auto-prompts:
-            - id: "1"
-              question: "Destination file"
-              answer: "ENTER"
-            - id: "2"
-              question: "overwrite"
-              answer: "yes"
+            tailf-ned-cisco-ios-xr-meta:cisco-iosxr:
+              live-status:
+                auto-prompts:
+                - id: "1"
+                  question: "Destination file"
+                  answer: "ENTER"
+                - id: "2"
+                  question: "overwrite"
+                  answer: "yes"
 
 - name: backup running-config
   nso_action:

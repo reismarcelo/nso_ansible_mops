@@ -1,5 +1,6 @@
 temp/
 # Created by .ignore support plugin (hsz.mobi)
+production
 *.retry
 .idea/
 cmake-build-debug/

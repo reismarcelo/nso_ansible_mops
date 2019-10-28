@@ -1,5 +1,6 @@
 ---
 # tasks file for pre-upgrade
+# TODO: Not working with latest NED version
 - name: disable fpd auto-upgrade
   nso_config:
     url: "{{ nso.url }}"
@@ -9,11 +10,12 @@
       tailf-ncs:devices:
         device:
         - name: "{{ target_device }}"
-          tailf-ncs:config:
-            tailf-ned-cisco-ios-xr:admin:
-              fpd:
-                auto-upgrade:
-                __state: absent
+          config:
+           tailf-ned-cisco-ios-xr:admin:
+            fpd:
+              auto-upgrade: {}
+              __state: absent
+
 
 
 

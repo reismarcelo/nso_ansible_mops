@@ -61,7 +61,9 @@
     password: "{{ nso.password }}"
     path: "/ncs:devices/device{'{{ target_device }}'}/live-status/cisco-ios-xr-stats:exec/any"
     input:
-      args: [ "admin install activate id {{ install_add_result.output.result | regex_findall('Install operation (\\d+) completed successfully') | max }} prompt-level none synchronous parallel-reload | noprompts" ]
+      args: [ "admin install activate id {{ install_add_result.output.result | regex_findall('Install operation (\\d+) completed successfully') | max }} prompt-level none synchronous {{'parallel-reload' if xr_package.reload else ''}} | noprompts" ]
+  register: install_act_result
+  failed_when: "'completed successfully at' not in install_act_result.output.result"
   tags:
   - service_impact
 
@@ -71,6 +73,9 @@
     username: "{{ nso.username }}"
     password: "{{ nso.password }}"
     path: "/ncs:devices/device{'{{ target_device }}'}/disconnect"
+  when:
+  - xr_package.reload is defined
+  - xr_package.reload | bool
   tags:
   - service_impact
 
@@ -81,8 +86,11 @@
     password: "{{ nso.password }}"
     path: "/ncs:devices/device{'{{ target_device }}'}/ping"
   register: ping_result
+  when:
+  - xr_package.reload is defined
+  - xr_package.reload | bool
   changed_when: false
-  until: "'0 packets received' in ping_result.output.result"
+  until: "'0 received' in ping_result.output.result"
   retries: "{{ wait_reload.retries }}"
   delay: "{{ wait_reload.timeout }}"
   tags:
