@@ -13,6 +13,8 @@
 
   - import_role:
       name: pre-post-checks
+    vars:
+      post_check: false
 
   - import_role:
       name: pre-upgrade

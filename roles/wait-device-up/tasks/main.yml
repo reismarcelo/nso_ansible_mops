@@ -8,7 +8,7 @@
     path: "/ncs:devices/device{'{{ target_device }}'}/ping"
   register: ping_result
   changed_when: false
-  until: "'1 packets received' in ping_result.output.result"
+  until: "'1 received' in ping_result.output.result"
   retries: "{{ wait_1.retries }}"
   delay: "{{ wait_1.timeout }}"
 

@@ -19,10 +19,10 @@
     password: "{{ nso.password }}"
     path: "/ncs:services/snap:health-samples/snap:device{'{{ target_device }}'}/diff"
   register: diff_check_result
+  when:
+  - post_check is defined
+  - post_check | bool
   changed_when: false
   failed_when: >
     ("output" not in diff_check_result) or
     ("success" not in diff_check_result.output)
-  when:
-  - post_check is defined
-  - post_check | bool

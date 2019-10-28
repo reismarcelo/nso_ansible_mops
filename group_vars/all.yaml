@@ -1,9 +1,9 @@
 ---
 # NSO server information
 nso:
-  url: http://localhost:8080/jsonrpc
-  username: admin
-  password: admin
+  url: "http://10.85.136.252:8080/jsonrpc"
+  username: "centos"
+  password: "C!sc0123"
 
 # Device to be upgraded
 target_device: "A3-ASR9K-R6"
@@ -12,3 +12,5 @@ target_device: "A3-ASR9K-R6"
 xr_package:
   location: "harddisk:/"
   filename: "asr9k-px-5.3.3-smupack.tar"
+  reload: false
+
